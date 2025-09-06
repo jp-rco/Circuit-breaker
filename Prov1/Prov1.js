@@ -2,29 +2,46 @@
 const http = require("http");
 
 const PORT = process.env.PORT || 3001;
-// Probabilidad de fallo (0..1). Puedes ajustar: FAIL_RATE=0.7 node bureau-x.js
-const FAIL_RATE = parseFloat(process.env.FAIL_RATE || "0.7");
+
+let isOn = true; // por defecto encendido
 
 const server = http.createServer((req, res) => {
-  if (req.url.startsWith("/score")) {
-    // Puedes forzar fallo con ?fail=1 para pruebas determinísticas
-    const url = new URL(req.url, `http://localhost:${PORT}`);
-    const forced = url.searchParams.get("fail") === "1";
+  const url = new URL(req.url, `http://localhost:${PORT}`);
 
-    const fail = forced || Math.random() < FAIL_RATE;
-    if (fail) {
+  if (url.pathname === "/score") {
+    if (!isOn) {
       res.statusCode = 500;
-      res.end("Buro X ERROR");
-    } else {
-      res.statusCode = 200;
-      res.end("Buro X");
+      res.end("Buro X ERROR (apagado)");
+      return;
     }
+    res.statusCode = 200;
+    res.end("Buro X");
     return;
   }
+
+  // Endpoints de administración locales (sin auth) para pruebas
+  if (url.pathname === "/admin/on") {
+    isOn = true;
+    res.statusCode = 200;
+    res.end("Buro X encendido");
+    return;
+  }
+  if (url.pathname === "/admin/off") {
+    isOn = false;
+    res.statusCode = 200;
+    res.end("Buro X apagado");
+    return;
+  }
+  if (url.pathname === "/admin/status") {
+    res.statusCode = 200;
+    res.end(JSON.stringify({ isOn }));
+    return;
+  }
+
   res.statusCode = 404;
   res.end("Not found");
 });
 
 server.listen(PORT, () =>
-  console.log(`Buro X en http://localhost:${PORT} (FAIL_RATE=${FAIL_RATE})`)
+  console.log(`Buro X en http://localhost:${PORT} (admin: /admin/on | /admin/off | /admin/status)`)
 );
