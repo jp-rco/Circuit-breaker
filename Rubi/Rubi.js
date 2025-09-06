@@ -1,14 +1,12 @@
-// service.js
 const http = require("http");
 
-const FAILURE_COUNT_THRESHOLD = 5;  // fallos consecutivos antes de abrir
-const OPEN_TIMEOUT_MS = 30_000;     // espera antes del probe
-const HALF_OPEN_PROBES = 1;         // número de probes permitidos
+const FAILURE_COUNT_THRESHOLD = 5;  
+const OPEN_TIMEOUT_MS = 30_000;    
+const HALF_OPEN_PROBES = 1;        
 
 const BUREAU_X_URL = "http://localhost:3001/score";
 const BUREAU_Y_URL = "http://localhost:3002/score";
 
-// -------- Circuit Breaker --------
 class CircuitBreaker {
   constructor({ failureCountThreshold, openTimeoutMs, halfOpenProbes }) {
     this.failureCountThreshold = failureCountThreshold;

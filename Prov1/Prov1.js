@@ -1,16 +1,15 @@
-// bureau-x.js
 const http = require("http");
 
 const PORT = process.env.PORT || 3001;
 
-let isOn = true; // por defecto encendido
+let isOn = true; 
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
   if (url.pathname === "/score") {
     if (!isOn) {
-      res.statusCode = 500;
+      res.statusCode = 500;   
       res.end("Buro X ERROR (apagado)");
       return;
     }
@@ -19,7 +18,6 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Endpoints de administración locales (sin auth) para pruebas
   if (url.pathname === "/admin/on") {
     isOn = true;
     res.statusCode = 200;
